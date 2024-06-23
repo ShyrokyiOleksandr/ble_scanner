@@ -6,8 +6,7 @@ class BleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter BLE',
+    return const MaterialApp(
       home: BLEScreen(),
     );
   }

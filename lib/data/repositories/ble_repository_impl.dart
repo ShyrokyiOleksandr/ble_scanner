@@ -1,5 +1,4 @@
 import 'package:ble_scanner/data/data_sources/ble_remote_data_source.dart';
-import 'package:ble_scanner/domain/entities/ble_device.dart';
 import 'package:ble_scanner/domain/repositories/ble_repository.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -9,9 +8,8 @@ class BLERepositoryImpl implements BLERepository {
   BLERepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<BLEDevice>> scanForDevices() async {
-    final models = await remoteDataSource.scanForDevices();
-    return models.map((model) => BLEDevice(id: model.id, name: model.name)).toList();
+  Future<List<BluetoothDevice>> scanForDevices() async {
+    return await remoteDataSource.scanForDevices();
   }
 
   @override

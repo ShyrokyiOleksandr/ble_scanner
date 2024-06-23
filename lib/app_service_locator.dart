@@ -1,14 +1,14 @@
 import 'package:ble_scanner/data/data_sources/ble_remote_data_source.dart';
 import 'package:ble_scanner/data/repositories/ble_repository_impl.dart';
 import 'package:ble_scanner/domain/repositories/ble_repository.dart';
-import 'package:ble_scanner/domain/use_cases/connect_to_device.dart';
-import 'package:ble_scanner/domain/use_cases/discover_services.dart';
-import 'package:ble_scanner/domain/use_cases/scan_for_devices.dart';
+import 'package:ble_scanner/domain/use_cases/connect_to_device_use_case.dart';
+import 'package:ble_scanner/domain/use_cases/discover_services_use_case.dart';
+import 'package:ble_scanner/domain/use_cases/scan_for_devices_use_case.dart';
 import 'package:ble_scanner/presentation/features/ble/bloc/ble_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 class AppServiceLocator {
-  static void setup() {
+  static Future<void> setup() async {
     // data sources
     GetIt.I.registerLazySingleton<BLERemoteDataSource>(() => BLERemoteDataSourceImpl());
 
@@ -20,16 +20,16 @@ class AppServiceLocator {
     );
 
     // use cases
-    GetIt.I.registerLazySingleton(() => ScanForDevices(GetIt.I<BLERepository>()));
-    GetIt.I.registerLazySingleton(() => ConnectToDevice(GetIt.I<BLERepository>()));
-    GetIt.I.registerLazySingleton(() => DiscoverServices(GetIt.I<BLERepository>()));
+    GetIt.I.registerLazySingleton(() => ScanForDevicesUseCase(GetIt.I<BLERepository>()));
+    GetIt.I.registerLazySingleton(() => ConnectToDeviceUseCase(GetIt.I<BLERepository>()));
+    GetIt.I.registerLazySingleton(() => DiscoverServicesUseCase(GetIt.I<BLERepository>()));
 
     // blocs
     GetIt.I.registerFactory(
       () => BLECubit(
-        scanForDevices: GetIt.I<ScanForDevices>(),
-        connectToDevice: GetIt.I<ConnectToDevice>(),
-        discoverServices: GetIt.I<DiscoverServices>(),
+        scanForDevicesUseCase: GetIt.I<ScanForDevicesUseCase>(),
+        connectToDeviceUseCase: GetIt.I<ConnectToDeviceUseCase>(),
+        discoverServicesUseCase: GetIt.I<DiscoverServicesUseCase>(),
       ),
     );
   }

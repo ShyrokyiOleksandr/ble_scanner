@@ -1,12 +1,12 @@
 import 'package:ble_scanner/domain/repositories/ble_repository.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
-class ConnectToDevice {
+class ConnectToDeviceUseCase {
   final BLERepository repository;
 
-  ConnectToDevice(this.repository);
+  ConnectToDeviceUseCase(this.repository);
 
-  Future<void> call(BluetoothDevice device) async {
+  Future<void> execute(BluetoothDevice device) async {
     await repository.connectToDevice(device);
   }
 }

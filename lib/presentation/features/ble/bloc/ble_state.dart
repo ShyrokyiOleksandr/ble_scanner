@@ -1,50 +1,59 @@
-import 'package:ble_scanner/domain/entities/ble_device.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
-abstract class BLEState extends Equatable {
-  const BLEState();
-
-  @override
-  List<Object> get props => [];
-}
-
-class BLEInitial extends BLEState {}
-
-class BLELoading extends BLEState {}
-
-class BLELoaded extends BLEState {
-  final List<BLEDevice> devices;
-
-  const BLELoaded(this.devices);
-
-  @override
-  List<Object> get props => [devices];
-}
-
-class BLEConnected extends BLEState {
-  final BluetoothDevice device;
-
-  const BLEConnected(this.device);
-
-  @override
-  List<Object> get props => [device];
-}
-
-class BLEServicesDiscovered extends BLEState {
+class BLEState extends Equatable {
+  final bool isLoading;
+  final List<BluetoothDevice> devices;
+  final BluetoothDevice? device;
   final List<BluetoothService> services;
+  final String? errorMessage;
 
-  const BLEServicesDiscovered(this.services);
+  const BLEState({
+    required this.isLoading,
+    required this.devices,
+    required this.device,
+    required this.services,
+    required this.errorMessage,
+  });
+
+  factory BLEState.initial() {
+    return const BLEState(
+      isLoading: false,
+      devices: [],
+      device: null,
+      services: [],
+      errorMessage: null,
+    );
+  }
 
   @override
-  List<Object> get props => [services];
-}
-
-class BLEError extends BLEState {
-  final String message;
-
-  const BLEError(this.message);
+  bool get stringify => true;
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props {
+    return [
+      isLoading,
+      devices,
+      device,
+      services,
+      errorMessage,
+    ];
+  }
+
+  BLEState copyWith({
+    bool? isLoading,
+    List<BluetoothDevice>? devices,
+    BluetoothDevice? device,
+    List<BluetoothService>? services,
+    String? errorMessage,
+  }) {
+    return BLEState(
+      isLoading: isLoading ?? this.isLoading,
+      devices: devices ?? this.devices,
+      device: device ?? this.device,
+      services: services ?? this.services,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
 }

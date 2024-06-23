@@ -1,48 +1,49 @@
-import 'package:ble_scanner/domain/use_cases/connect_to_device.dart';
-import 'package:ble_scanner/domain/use_cases/discover_services.dart';
-import 'package:ble_scanner/domain/use_cases/scan_for_devices.dart';
+import 'package:ble_scanner/domain/use_cases/connect_to_device_use_case.dart';
+import 'package:ble_scanner/domain/use_cases/discover_services_use_case.dart';
+import 'package:ble_scanner/domain/use_cases/scan_for_devices_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'ble_state.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
+import 'ble_state.dart';
+
 class BLECubit extends Cubit<BLEState> {
-  final ScanForDevices scanForDevices;
-  final ConnectToDevice connectToDevice;
-  final DiscoverServices discoverServices;
+  final ScanForDevicesUseCase scanForDevicesUseCase;
+  final ConnectToDeviceUseCase connectToDeviceUseCase;
+  final DiscoverServicesUseCase discoverServicesUseCase;
 
   BLECubit({
-    required this.scanForDevices,
-    required this.connectToDevice,
-    required this.discoverServices,
-  }) : super(BLEInitial());
+    required this.scanForDevicesUseCase,
+    required this.connectToDeviceUseCase,
+    required this.discoverServicesUseCase,
+  }) : super(BLEState.initial());
 
-  Future<void> scanForDevicesEvent() async {
-    emit(BLELoading());
+  Future<void> scanForDevices() async {
+    emit(state.copyWith(isLoading: true));
     try {
-      final devices = await scanForDevices();
-      emit(BLELoaded(devices));
+      final devices = await scanForDevicesUseCase.execute();
+      emit(state.copyWith(isLoading: false, devices: devices));
     } catch (e) {
-      emit(BLEError(e.toString()));
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
   }
 
-  Future<void> connectToDeviceEvent(BluetoothDevice device) async {
-    emit(BLELoading());
+  Future<void> connectToDevice(BluetoothDevice device) async {
+    emit(state.copyWith(isLoading: true));
     try {
-      await connectToDevice(device);
-      emit(BLEConnected(device));
+      await connectToDeviceUseCase.execute(device);
+      emit(state.copyWith(isLoading: false, device: device));
     } catch (e) {
-      emit(BLEError(e.toString()));
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
   }
 
-  Future<void> discoverServicesEvent(BluetoothDevice device) async {
-    emit(BLELoading());
+  Future<void> discoverServices(BluetoothDevice device) async {
+    emit(state.copyWith(isLoading: true));
     try {
-      final services = await discoverServices(device);
-      emit(BLEServicesDiscovered(services));
+      final services = await discoverServicesUseCase.execute(device);
+      emit(state.copyWith(isLoading: false, services: services));
     } catch (e) {
-      emit(BLEError(e.toString()));
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
   }
 }
