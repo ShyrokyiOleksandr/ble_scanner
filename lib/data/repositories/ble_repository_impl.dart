@@ -8,13 +8,13 @@ class BLERepositoryImpl implements BLERepository {
   BLERepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<BluetoothDevice>> scanForDevices() async {
-    return await remoteDataSource.scanForDevices();
+  Stream<List<BluetoothDevice>> scanForDevices() {
+    return remoteDataSource.scanForDevices();
   }
 
   @override
-  Future<void> connectToDevice(BluetoothDevice device) async {
-    await remoteDataSource.connectToDevice(device);
+  Stream<BluetoothDeviceState> connectToDevice(BluetoothDevice device) {
+    return remoteDataSource.connectToDevice(device);
   }
 
   @override

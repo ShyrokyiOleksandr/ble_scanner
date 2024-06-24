@@ -6,7 +6,7 @@ class ScanForDevicesUseCase {
 
   ScanForDevicesUseCase(this.repository);
 
-  Future<List<BluetoothDevice>> execute() async {
-    return await repository.scanForDevices();
+  Stream<List<BluetoothDevice>> execute() {
+    return repository.scanForDevices();
   }
 }

@@ -6,7 +6,7 @@ class ConnectToDeviceUseCase {
 
   ConnectToDeviceUseCase(this.repository);
 
-  Future<void> execute(BluetoothDevice device) async {
-    await repository.connectToDevice(device);
+  Stream<BluetoothDeviceState> execute(BluetoothDevice device) {
+    return repository.connectToDevice(device);
   }
 }

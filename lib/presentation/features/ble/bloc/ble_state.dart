@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -30,17 +29,6 @@ class BLEState extends Equatable {
   @override
   bool get stringify => true;
 
-  @override
-  List<Object?> get props {
-    return [
-      isLoading,
-      devices,
-      device,
-      services,
-      errorMessage,
-    ];
-  }
-
   BLEState copyWith({
     bool? isLoading,
     List<BluetoothDevice>? devices,
@@ -55,5 +43,16 @@ class BLEState extends Equatable {
       services: services ?? this.services,
       errorMessage: errorMessage ?? this.errorMessage,
     );
+  }
+
+  @override
+  List<Object?> get props {
+    return [
+      isLoading,
+      devices,
+      device,
+      services,
+      errorMessage,
+    ];
   }
 }

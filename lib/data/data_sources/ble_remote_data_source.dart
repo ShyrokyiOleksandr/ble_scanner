@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter_blue/flutter_blue.dart';
 
 abstract class BLERemoteDataSource {
-  Future<List<BluetoothDevice>> scanForDevices();
-  Future<void> connectToDevice(BluetoothDevice device);
+  Stream<List<BluetoothDevice>> scanForDevices();
+  Stream<BluetoothDeviceState> connectToDevice(BluetoothDevice device);
   Future<List<BluetoothService>> discoverServices(BluetoothDevice device);
 }
 
@@ -10,25 +13,62 @@ class BLERemoteDataSourceImpl implements BLERemoteDataSource {
   final FlutterBlue _flutterBlue = FlutterBlue.instance;
 
   @override
-  Future<List<BluetoothDevice>> scanForDevices() async {
-    List<BluetoothDevice> devices = [];
+  Stream<List<BluetoothDevice>> scanForDevices() async* {
+    log('Starting device scan...');
+
+    // Start the scan
     _flutterBlue.startScan(timeout: const Duration(seconds: 4));
-    await for (var scanResultList in _flutterBlue.scanResults) {
-      for (ScanResult scanResult in scanResultList) {
-        devices.add(scanResult.device);
-      }
-    }
+    log('Scan started.');
+
+    // Create a stream controller to manage the scan results
+    final StreamController<List<BluetoothDevice>> controller =
+        StreamController<List<BluetoothDevice>>();
+
+    // Listen to the scan results and add them to the controller
+    _flutterBlue.scanResults.listen((results) {
+      List<BluetoothDevice> devices = results.map((r) => r.device).toList();
+      controller.add(devices);
+    });
+    log('Listening to scan results...');
+
+    // Yield the controller's stream
+    yield* controller.stream;
+
+    // Stop the scan after the timeout
+    await Future.delayed(const Duration(seconds: 4));
     _flutterBlue.stopScan();
-    return devices;
+    log('Scan stopped.');
+
+    // Close the controller when done
+    await controller.close();
+    log('Stream controller closed.');
   }
 
   @override
-  Future<void> connectToDevice(BluetoothDevice device) async {
-    await device.connect();
+  Stream<BluetoothDeviceState> connectToDevice(BluetoothDevice device) async* {
+    log('Connecting to device ${device.name}...');
+
+    final streamController = StreamController<BluetoothDeviceState>();
+
+    device.state.listen((stateEvent) async {
+      if (stateEvent == BluetoothDeviceState.disconnected) {
+        await device.connect();
+        log('Connected to device ${device.name}.');
+      }
+
+      streamController.add(stateEvent);
+    });
+
+    yield* streamController.stream;
   }
 
   @override
   Future<List<BluetoothService>> discoverServices(BluetoothDevice device) async {
-    return await device.discoverServices();
+    log('Discovering services for device ${device.name}...');
+
+    List<BluetoothService> services = await device.discoverServices();
+
+    log('Discovered ${services.length} services for device ${device.name}.');
+    return services;
   }
 }

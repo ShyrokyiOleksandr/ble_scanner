@@ -20,8 +20,9 @@ class BLECubit extends Cubit<BLEState> {
   Future<void> scanForDevices() async {
     emit(state.copyWith(isLoading: true));
     try {
-      final devices = await scanForDevicesUseCase.execute();
-      emit(state.copyWith(isLoading: false, devices: devices));
+      scanForDevicesUseCase.execute().listen((devices) {
+        emit(state.copyWith(isLoading: false, devices: devices));
+      });
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
@@ -30,8 +31,11 @@ class BLECubit extends Cubit<BLEState> {
   Future<void> connectToDevice(BluetoothDevice device) async {
     emit(state.copyWith(isLoading: true));
     try {
-      await connectToDeviceUseCase.execute(device);
-      emit(state.copyWith(isLoading: false, device: device));
+      connectToDeviceUseCase.execute(device).listen((stateEvent) {
+        if (stateEvent == BluetoothDeviceState.connected) {
+          emit(state.copyWith(isLoading: false, device: device));
+        }
+      });
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }

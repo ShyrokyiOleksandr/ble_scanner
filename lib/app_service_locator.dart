@@ -25,7 +25,7 @@ class AppServiceLocator {
     GetIt.I.registerLazySingleton(() => DiscoverServicesUseCase(GetIt.I<BLERepository>()));
 
     // blocs
-    GetIt.I.registerFactory(
+    GetIt.I.registerLazySingleton(
       () => BLECubit(
         scanForDevicesUseCase: GetIt.I<ScanForDevicesUseCase>(),
         connectToDeviceUseCase: GetIt.I<ConnectToDeviceUseCase>(),
