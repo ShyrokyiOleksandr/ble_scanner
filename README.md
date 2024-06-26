@@ -2,7 +2,7 @@
 
 ## Scan and watch scanned devices bluetooth characteristics
 
-- **Android build for testing:** `flutter_ble.apk` in project root
+- **Android build for testing:** unarchive and install `flutter_ble.apk.zip` in project root
 
 ### Instructions:
 1. Install and Run the app
